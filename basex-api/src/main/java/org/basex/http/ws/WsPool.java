@@ -30,14 +30,6 @@ public final class WsPool {
   private final ConcurrentHashMap<String, WebSocket> clients = new ConcurrentHashMap<>();
 
   /**
-   * Closes the WebsocketConnection.
-   * @param id The id of the Websocket.
-   * @param reason The String reason
-   * */
-  public void closeWebsocket(final String id, final String reason) {
-    clients.get(id).closeWebsocket(reason);
-  }
-  /**
    * Returns the pool instance.
    * @return instance
    */
@@ -97,17 +89,17 @@ public final class WsPool {
   /**
    * Sends a message to all connected clients except to the one with the given id.
    * @param message message
-   * @param client The client id (can be {@code null})
+   * @param id The client id (can be {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void broadcast(final Item message, final String client)
+  public void broadcast(final Item message, final String id)
       throws QueryException, IOException {
 
     final ArrayList<WebSocket> list = new ArrayList<>();
     for(final Entry<String, WebSocket> entry : clients.entrySet()) {
-      final String id = entry.getKey();
-      if(client == null || !client.equals(id)) list.add(entry.getValue());
+      final String key = entry.getKey();
+      if(id == null || !id.equals(key)) list.add(entry.getValue());
     };
     send(message, list);
   }
@@ -126,6 +118,15 @@ public final class WsPool {
       if(ws != null) list.add(ws);
     }
     send(message, list);
+  }
+
+  /**
+   * Closes the connection.
+   * @param reason reason for closing the connection
+   * @param id id of client
+   */
+  public void close(final String reason, final String id) {
+    clients.get(id).close(reason);
   }
 
   /**

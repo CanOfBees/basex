@@ -154,11 +154,13 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   /**
-   * Closes the Websocket-Connection.
-   * @param reason The String Reason
-   * */
-  public void closeWebsocket(final String reason) {
-    getSession().close(StatusCode.NORMAL, reason);
+   * Closes the connection.
+   * @param reason reason for closing the connection
+   */
+  public void close(final String reason) {
+    try(Session ws = getSession()) {
+      if(ws != null) ws.close(StatusCode.NORMAL, reason);
+    }
   }
 
   /**
